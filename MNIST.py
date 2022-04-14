@@ -25,21 +25,22 @@ class MnistDataloader(object):
             magic, size = struct.unpack(">II", file.read(8))
             if magic != 2049:
                 raise ValueError('Magic number mismatch, expected 2049, got {}'.format(magic))
-            labels = array("B", file.read())        
+            labels = np.array(array("B", file.read()))
         
         with open(images_filepath, 'rb') as file:
             magic, size, rows, cols = struct.unpack(">IIII", file.read(16))
             if magic != 2051:
                 raise ValueError('Magic number mismatch, expected 2051, got {}'.format(magic))
             image_data = array("B", file.read())        
-        images = []
+
+        images = np.empty((size,28,28))
+
         for i in range(size):
-            images.append([0] * rows * cols)
-        for i in range(size):
+            # images.append([0] * rows * cols)
             img = np.array(image_data[i * rows * cols:(i + 1) * rows * cols])
             img = img.reshape(28, 28)
-            images[i][:] = img            
-        
+            images[:][:][i] = img            
+
         return images, labels
             
     def load_data(self):
