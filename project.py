@@ -4,22 +4,30 @@
 import numpy as np
 from numpy.random import seed
 import matplotlib.pyplot as plt
-import matplotlib
-import MNIST
+
+import sys
 from os.path import join
 import random
+
+import MNIST
+
 import tensorflow as tf
 from tensorflow.keras import datasets, layers, models
 
 from sklearn import neighbors
+from sklearn.metrics import accuracy_score
 from heatmapplot import *
 
 def main():
-
-    mode = input('select mode. mode 1: train cnn. mode 2: test cnn. mode 3: knn.\n')
-
     seed(1)
     tf.random.set_seed(2)
+
+    try:
+        mode = sys.argv[1]
+        mode = int(mode)
+    except:
+        mode = 0
+        pass
 
     input_path = './input'
     training_images_filepath = join(input_path, 'train-images-idx3-ubyte/train-images-idx3-ubyte')
@@ -32,8 +40,6 @@ def main():
     (xtrain, ytrain), (xtest, ytest) = mnist.load_data()
 
     # Vectorizing images for KNN
-    xktrain = [x.flatten() for x in xtrain]
-    xktest = [x.flatten() for x in xtest]
 
     # Normalizing images for CNN
     xtrain = np.expand_dims(xtrain, axis=-1) # <--- add batch axisp
@@ -41,27 +47,35 @@ def main():
     xtest = np.expand_dims(xtest, axis=-1) # <--- add batch axisp
     xtest = xtest.astype('float32') / 255
 
-    try:
-        mode = int(mode)
-
-    except:
-        print('Wrong input')
-        return
+    xktrain = [x.flatten() for x in xtrain]
+    xktest = [x.flatten() for x in xtest]
 
     if mode == 1:
-        model = init_cnn()
-
-        model = train_cnn(model, xtrain, ytrain, xtest, ytest)
+        CNN1(xtrain, ytrain, xtest, ytest)
+        CNN2(xtest,ytest)
 
     elif mode == 2:
-        model = tf.keras.models.load_model('./model')
-        model.summary()
-
-        test_cnn(model, xtest,ytest)
+        CNN2(xtest,ytest)
 
     elif mode == 3:
-        knn = train_knn(xktrain, ytrain, 2)
-        test_knn(knn, xktest, ytest)
+        KNN(xktrain, ytrain, xktest, ytest)
+
+    else:
+        CNN1(xtrain, ytrain, xtest, ytest)
+        CNN2(xtest,ytest)
+
+        KNN(xktrain, ytrain, xktest, ytest)
+
+def CNN1(xtrain, ytrain, xtest, ytest):
+    train_cnn(xtrain, ytrain, xtest, ytest)
+    test_cnn(xtest,ytest)
+
+def CNN2(xtest, ytest):
+    test_cnn(xtest,ytest)
+
+def KNN(xtrain, ytrain, xtest, ytest):
+    knn = train_knn(xtrain, ytrain, 1)
+    test_knn(knn, xtest, ytest)
 
 def init_cnn():
     print('='*90)
@@ -82,7 +96,9 @@ def init_cnn():
     return model
 
 
-def train_cnn(model, images, labels, test_images, test_labels):
+def train_cnn(images, labels, test_images, test_labels):
+    model = init_cnn()
+
     print('-'*90)
     history = model.fit(images, labels, epochs=2, verbose=1,
                     validation_data=(test_images, test_labels))
@@ -99,7 +115,10 @@ def train_cnn(model, images, labels, test_images, test_labels):
 
     return model
 
-def test_cnn(model, test_images, test_labels):
+def test_cnn(test_images, test_labels):
+    model = tf.keras.models.load_model('./model')
+    model.summary()
+
     test_loss, test_acc = model.evaluate(test_images,  test_labels, verbose=2)
 
     print(f'Validation Loss {test_loss}')
@@ -133,10 +152,14 @@ def test_cnn(model, test_images, test_labels):
 def train_knn(train_images, train_labels, k=3):
     knn = neighbors.KNeighborsClassifier(k,weights='distance')
     knn.fit(train_images, train_labels)
+
     return knn
     
 def test_knn(knn, test_images, test_labels):
     y = knn.predict(test_images) 
+
+    acc = accuracy_score(test_labels, y)
+    print(f'Accuracy: {acc}')
 
     assert len(y)==len(test_labels)
 
