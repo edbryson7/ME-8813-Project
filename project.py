@@ -63,14 +63,15 @@ def init_model():
     model = models.Sequential()
 
     model.add(layers.Conv2D(32, (3, 3), activation='relu', input_shape=(28, 28, 1)))
-    model.add(layers.MaxPooling2D((2, 2)))
-    model.add(layers.Conv2D(64, (3, 3), activation='relu'))
-    model.add(layers.MaxPooling2D((2, 2)))
-    model.add(layers.Conv2D(64, (3, 3), activation='relu'))
+    # model.add(layers.MaxPooling2D((2, 2)))
+    # model.add(layers.Conv2D(64, (3, 3), activation='relu'))
+    # model.add(layers.MaxPooling2D((2, 2)))
+    # model.add(layers.Conv2D(64, (3, 3), activation='relu'))
 
     model.add(layers.Flatten())
-    model.add(layers.Dense(64, activation='relu'))
-    model.add(layers.Dense(10))
+    model.add(layers.Dense(20, activation='relu'))
+    # model.add(layers.Dense(10))
+    model.add(layers.Dense(10, activation='relu'))
 
     # model.summary()
 
@@ -96,7 +97,7 @@ def train(model, images, labels, test_images, test_labels):
     plt.ylabel('accuracy')
     plt.ylim([0.5, 1])
     plt.legend(loc='lower right')
-    plt.show()
+    # plt.show()
 
     return model
 
@@ -119,12 +120,16 @@ def test(model, test_images, test_labels):
         heat[y[i],test_labels[i]]+=1
 
     fig, ax = plt.subplots()
+    plt.title('Confusion Matrix of Test Set Validation')
+    plt.xlabel('Correct Digit')
+    plt.ylabel('Predicted Digit')
 
     im, cbar = heatmap(heat, range(10), range(10), ax=ax, cmap='cividis',
             cbarlabel='correct predictions')
 
     texts = annotate_heatmap(im,heat,textcolors=('white','black'))
     fig.tight_layout()
+    plt.savefig('heatmap.png', dpi=1200)
     plt.show()
 
 
