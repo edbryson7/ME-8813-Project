@@ -132,12 +132,15 @@ def test_cnn(test_images, test_labels):
     assert len(y)==len(test_labels)
 
     # Creating a heatmap
-    heat = np.zeros((10,10),dtype=int)
+    heat = np.zeros((10,10))#,dtype=int)
     for i in range(len(y)):
         heat[y[i],test_labels[i]]+=1
 
+    for i in range(10):
+        heat[:,i]=heat[:,i]/sum(heat[:,i])
+
     fig, ax = plt.subplots()
-    plt.title('CNN Confusion Matrix of Test Set Validation')
+    plt.title('CNN Confusion Matrix of Test Set Validation\n')
     plt.xlabel('Correct Digit')
     plt.ylabel('Predicted Digit')
 
@@ -164,12 +167,15 @@ def test_knn(knn, test_images, test_labels):
     assert len(y)==len(test_labels)
 
     # Creating a heatmap
-    heat = np.zeros((10,10),dtype=int)
+    heat = np.zeros((10,10))#,dtype=float32)
     for i in range(len(y)):
         heat[y[i],test_labels[i]]+=1
 
+    for i in range(10):
+        heat[:,i]=heat[:,i]/sum(heat[:,i])
+
     fig, ax = plt.subplots()
-    plt.title('KNN Confusion Matrix of Test Set Validation')
+    plt.title('KNN Confusion Matrix of Test Set Validation\n')
     plt.xlabel('Correct Digit')
     plt.ylabel('Predicted Digit')
 

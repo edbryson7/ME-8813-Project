@@ -1,6 +1,7 @@
-import matplotlib.pyplot as plt
-import matplotlib
 import numpy as np
+import matplotlib
+import matplotlib.pyplot as plt
+
 # The following two functions are taken from the matplotlib documentation
 def heatmap(data, row_labels, col_labels, ax=None,
             cbar_kw={}, cbarlabel="", **kwargs):
@@ -41,8 +42,8 @@ def heatmap(data, row_labels, col_labels, ax=None,
     ax.set_yticks(np.arange(data.shape[0]), labels=row_labels)
 
     # Let the horizontal axes labeling appear on top.
-    ax.tick_params(top=True, bottom=False,
-                   labeltop=True, labelbottom=False)
+    ax.tick_params(top=False, bottom=True,
+                   labeltop=False, labelbottom=True)
 
     # Rotate the tick labels and set their alignment.
     plt.setp(ax.get_xticklabels(), rotation=0, ha="right",
@@ -113,7 +114,8 @@ def annotate_heatmap(im, data=None, valfmt="{x:.2f}",
     for i in range(data.shape[0]):
         for j in range(data.shape[1]):
             kw.update(color=textcolors[int(im.norm(data[i, j]) > threshold)])
-            text = im.axes.text(j, i, data[i, j], **kw)
+            # print(type(data[i,j]))
+            text = im.axes.text(j, i, round(data[i, j],2), **kw)
             texts.append(text)
 
     return texts
