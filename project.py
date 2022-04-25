@@ -22,7 +22,7 @@ import IMG_P
 
 def main():
     # seed(1)
-    tf.random.set_seed(2)
+    # tf.random.set_seed(2)
 
     try:
         mode = sys.argv[1]
@@ -67,7 +67,9 @@ def main():
         KNN(xtrain, ytrain, xtest, ytest)
 
 def CNN1(xtrain, ytrain, xtest, ytest):
-    train_cnn(xtrain, ytrain, xtest, ytest)
+    shape = np.shape(xtrain[1])
+    model = init_cnn(shape)
+    train_cnn(model, xtrain, ytrain, xtest, ytest)
 
 def CNN2(xtest, ytest):
     test_cnn(xtest,ytest)
@@ -84,16 +86,17 @@ def KNN(xtrain, ytrain, xtest, ytest):
 
     show_random(xtest)
 
-def init_cnn():
+def init_cnn(inp_shape):
     print('='*90)
     model = models.Sequential()
 
-    model.add(layers.Conv2D(8, (3, 3), activation='relu', input_shape=(28, 28, 1)))
+    model.add(layers.Conv2D(8, (3, 3), activation='relu', input_shape=inp_shape))
     model.add(layers.MaxPooling2D((2, 2)))
     model.add(layers.Conv2D(16, (5, 5), activation='relu'))
     model.add(layers.MaxPooling2D((2, 2)))
     model.add(layers.Flatten())
     model.add(layers.Dense(20, activation='relu'))
+    model.add(layers.Dropout(.2))
     model.add(layers.Dense(10, activation='softmax'))
 
     model.summary()
@@ -105,8 +108,7 @@ def init_cnn():
     return model
 
 
-def train_cnn(images, labels, test_images, test_labels):
-    model = init_cnn()
+def train_cnn(model, images, labels, test_images, test_labels):
     model.summary()
 
     print('-'*90)

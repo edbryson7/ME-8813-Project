@@ -8,30 +8,34 @@ def process_image(images):
     # print(np.shape(images)[1:])
 
     # kernel = np.ones((3,3),np.uint8)
-    # kernel = np.array([[0, 1, 0],[1, 1, 1],[0, 1, 0]],np.uint8)
+    kernel = np.array([[0, 1, 0],[1, 1, 1],[0, 1, 0]],np.uint8)
     # kernel = np.array([[0, 0, 1],[0, 0, 1],[0, 0, 1]],np.uint8)
-    kernel = np.array([[1, 1],[1, 1]],np.uint8)
+    # kernel = np.array([[1, 1],[1, 1]],np.uint8)
 
-    new = np.zeros((len(images),26,26,1))
+    cut = 1
+    new = np.zeros((len(images),28-2*cut,28-2*cut,1))
+    # new = np.ones_like(images)
 
     for i in range(len(images)):
-        new[i] = crop(images[i])
-        new[i] = erode(new[i])
-        new[i] = binarize(new[i])
+        # new[i] = images[i]
+        new[i] = crop(images[i],cut)
+        # new[i] = morph(new[i])
+        # new[i] = threshold(new[i])
 
     return new
 
-def crop(image):
-    return image[1:-1,1:-1]
+def crop(image,c):
+    return image[c:-c,c:-c]
 
-def binarize(image):
-    # idx = image < .7
-    # image[idx] = 0
+def threshold(image):
+    idx = image < .2
+    image[idx] = 0
     return image
 
-    # return (.8<image)
+def binarize(image):
+    return (.8<image)
 
-def erode(image):
+def morph(image):
     image = cv2.dilate(image, kernel, iterations = 1)
     image = cv2.erode(image, kernel, iterations = 1)
     return np.expand_dims(image, axis=-1) # <--- add batch axisp
