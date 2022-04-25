@@ -8,15 +8,17 @@ def process_image(images):
     # print(np.shape(images)[1:])
 
     # kernel = np.ones((3,3),np.uint8)
-    kernel = np.array([[0, 1, 0],[1, 1, 1],[0, 1, 0]],np.uint8)
+    # kernel = np.array([[0, 1, 0],[1, 1, 1],[0, 1, 0]],np.uint8)
+    kernel = np.array([1, 1])
     # kernel = np.array([[0, 0, 1],[0, 0, 1],[0, 0, 1]],np.uint8)
     # kernel = np.array([[1, 1],[1, 1]],np.uint8)
 
     cut = 1
-    new = np.zeros((len(images),28-2*cut,28-2*cut,1))
+    new = np.zeros((len(images),20,20,1))
     # new = np.ones_like(images)
 
     for i in range(len(images)):
+        # print(i)
         # new[i] = images[i]
         new[i] = crop(images[i],cut)
         # new[i] = morph(new[i])
@@ -24,8 +26,61 @@ def process_image(images):
 
     return new
 
-def crop(image,c):
-    return image[c:-c,c:-c]
+def crop(img, c):
+    shape = np.shape(img)
+
+    row_first_bool = True
+    row_first=0
+    row_last=0
+    for i in range(shape[0]):
+        if any(img[i,:]):
+            if row_first_bool:
+                row_first = i
+                row_first_bool = False
+            row_last = i
+
+    col_first_bool = True
+    col_first=0
+    col_last=0
+    for i in range(shape[0]):
+        if any(img[:,i]):
+            if col_first_bool:
+                col_first = i
+                col_first_bool = False
+            col_last = i
+
+    cond = True
+    count1 = True
+    count2 = True
+    while cond:
+        # print(row_last, row_first,end='\t')
+        # print(col_last, col_first)
+        h = 1+row_last-row_first
+        w = 1+col_last-col_first
+        # print(f'H: {h} W: {w}')
+        if h < 20:
+            if count1:
+                if row_first > 0:
+                    row_first -= 1
+                count1 = not count1
+            else:
+                if row_last < 27:
+                    row_last += 1
+                count1 = not count1
+        if w < 20:
+            if count2:
+                if col_first > 0:
+                    col_first -= 1
+                count2 = not count2
+            else:
+                if col_last < 27:
+                    col_last += 1
+                count2 = not count2
+
+        if h == 20 and w == 20:
+            cond = False
+    # return img[c:-c,c:-c]
+    return img[row_first:row_last+1,col_first:col_last+1]
 
 def threshold(image):
     idx = image < .2

@@ -84,7 +84,7 @@ def KNN(xtrain, ytrain, xtest, ytest):
     knn = train_knn(xktrain, ytrain, 4)
     test_knn(knn, xktest, ytest)
 
-    show_random(xtest)
+    show_random(xtest,ytest)
 
 def init_cnn(inp_shape):
     print('='*90)
@@ -123,8 +123,19 @@ def train_cnn(model, images, labels, test_images, test_labels):
     plt.ylabel('accuracy')
     plt.ylim([0.5, 1])
     plt.legend(loc='lower right')
-    # plt.show()
+    plt.title('CNN Training Accuracy')
+    plt.savefig('cnn_acc_history.png',dpi=1200)
+    plt.show()
 
+    plt.plot(history.history['loss'], label='loss')
+    plt.plot(history.history['val_loss'], label = 'val_loss')
+    plt.xlabel('epoch')
+    plt.ylabel('loss')
+    plt.ylim([0, 1])
+    plt.legend(loc='lower right')
+    plt.title('CNN Training Loss')
+    plt.savefig('cnn_loss_history.png',dpi=1200)
+    plt.show()
     return model
 
 def test_cnn(test_images, test_labels):
@@ -152,7 +163,7 @@ def test_cnn(test_images, test_labels):
         heat[:,i]=heat[:,i]/sum(heat[:,i])
 
     fig, ax = plt.subplots()
-    plt.title('CNN Confusion Matrix of Test Set Validation\n')
+    plt.title(f'CNN Validation Confusion Matrix: {round(test_acc*100,3)}% Accuracy\n')
     plt.xlabel('Correct Digit')
     plt.ylabel('Predicted Digit')
 
@@ -187,7 +198,7 @@ def test_knn(knn, test_images, test_labels):
         heat[:,i]=heat[:,i]/sum(heat[:,i])
 
     fig, ax = plt.subplots()
-    plt.title('KNN Confusion Matrix of Test Set Validation\n')
+    plt.title(f'KNN Validation Confusion Matrix: {round(acc*100,3)}% Accuracy\n')
     plt.xlabel('Correct Digit')
     plt.ylabel('Predicted Digit')
 
@@ -199,11 +210,10 @@ def test_knn(knn, test_images, test_labels):
     plt.savefig('knn_heatmap.png', dpi=1200)
     plt.show()
 
-def show_random(images):
-    ind = [random.randint(0,len(images)) for i in range(3)]
+def show_random(images, labels):
+    ind = [random.randint(0,len(images)) for i in range(100)]
     for i in ind:
-        plt.imshow(images[i])
-        plt.show()
+        show_im(images[i], labels[i])
 
 def show_im(image, title):
     plt.imshow(image, cmap=plt.cm.gray)
