@@ -211,7 +211,7 @@ def test_knn(knn, test_images, test_labels):
     plt.show()
 
 def show_random(images, labels):
-    ind = [random.randint(0,len(images)) for i in range(100)]
+    ind = [random.randint(0,len(images)) for i in range(10)]
     for i in ind:
         show_im(images[i], labels[i])
 
