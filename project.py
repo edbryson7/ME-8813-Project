@@ -18,8 +18,10 @@ from sklearn import neighbors
 from sklearn.metrics import accuracy_score
 from heatmapplot import *
 
+import IMG_P
+
 def main():
-    seed(1)
+    # seed(1)
     tf.random.set_seed(2)
 
     try:
@@ -47,8 +49,6 @@ def main():
     xtest = np.expand_dims(xtest, axis=-1) # <--- add batch axisp
     xtest = xtest.astype('float32') / 255
 
-    xktrain = [x.flatten() for x in xtrain]
-    xktest = [x.flatten() for x in xtest]
 
     if mode == 1:
         CNN1(xtrain, ytrain, xtest, ytest)
@@ -58,36 +58,45 @@ def main():
         CNN2(xtest,ytest)
 
     elif mode == 3:
-        KNN(xktrain, ytrain, xktest, ytest)
+        KNN(xtrain, ytrain, xtest, ytest)
 
     else:
+        model.summary()
         CNN1(xtrain, ytrain, xtest, ytest)
         CNN2(xtest,ytest)
 
-        KNN(xktrain, ytrain, xktest, ytest)
+        KNN(xtrain, ytrain, xtest, ytest)
 
 def CNN1(xtrain, ytrain, xtest, ytest):
     train_cnn(xtrain, ytrain, xtest, ytest)
-    test_cnn(xtest,ytest)
 
 def CNN2(xtest, ytest):
     test_cnn(xtest,ytest)
 
 def KNN(xtrain, ytrain, xtest, ytest):
-    knn = train_knn(xtrain, ytrain, 1)
-    test_knn(knn, xtest, ytest)
+    xtrain = IMG_P.process_image(xtrain)
+    xtest = IMG_P.process_image(xtest)
+    xktrain = [x.flatten() for x in xtrain]
+    xktest = [x.flatten() for x in xtest]
+
+    knn = train_knn(xktrain, ytrain, 1)
+    test_knn(knn, xktest, ytest)
+
+    show_random(xtest)
 
 def init_cnn():
     print('='*90)
     model = models.Sequential()
 
-    model.add(layers.Conv2D(32, (3, 3), activation='relu', input_shape=(28, 28, 1)))
+    model.add(layers.Conv2D(8, (3, 3), activation='relu', input_shape=(28, 28, 1)))
+    model.add(layers.MaxPooling2D((2, 2)))
+    model.add(layers.Conv2D(16, (5, 5), activation='relu'))
     model.add(layers.MaxPooling2D((2, 2)))
     model.add(layers.Flatten())
     model.add(layers.Dense(20, activation='relu'))
-    model.add(layers.Dense(10, activation='relu'))
+    model.add(layers.Dense(10, activation='softmax'))
 
-    # model.summary()
+    model.summary()
 
     model.compile(optimizer='adam',
               loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
@@ -98,9 +107,10 @@ def init_cnn():
 
 def train_cnn(images, labels, test_images, test_labels):
     model = init_cnn()
+    model.summary()
 
     print('-'*90)
-    history = model.fit(images, labels, epochs=2, verbose=1,
+    history = model.fit(images, labels, epochs=10, batch_size=250, verbose=1,
                     validation_data=(test_images, test_labels))
 
     model.save('./model')
@@ -186,6 +196,12 @@ def test_knn(knn, test_images, test_labels):
     fig.tight_layout()
     plt.savefig('knn_heatmap.png', dpi=1200)
     plt.show()
+
+def show_random(images):
+    ind = [random.randint(0,len(images)) for i in range(10)]
+    for i in ind:
+        plt.imshow(images[i])
+        plt.show()
 
 def show_im(image, title):
     plt.imshow(image, cmap=plt.cm.gray)
