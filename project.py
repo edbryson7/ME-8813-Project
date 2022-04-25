@@ -74,8 +74,8 @@ def CNN2(xtest, ytest):
     test_cnn(xtest,ytest)
 
 def KNN(xtrain, ytrain, xtest, ytest):
-    xtrain = IMG_P.process_image(xtrain)
-    xtest = IMG_P.process_image(xtest)
+    # xtrain = IMG_P.process_image(xtrain)
+    # xtest = IMG_P.process_image(xtest)
     xktrain = [x.flatten() for x in xtrain]
     xktest = [x.flatten() for x in xtest]
 

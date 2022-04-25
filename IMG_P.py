@@ -7,7 +7,7 @@ def process_image(images):
     kernel = np.ones((3,3),np.uint8)
     # kernel = np.array([[0, 1, 0],[1, 1, 1],[0, 1, 0]],np.uint8)
     kernel = np.array([[0, 1],[1, 1]],np.uint8)
-    new = np.full_like(images,0)
+    # new = np.full_like(images,0)
     for i in range(len(images)):
         # plt.imshow(images[i])
         # plt.show()
@@ -17,15 +17,16 @@ def process_image(images):
         # plt.imshow(new[i])
         # plt.show()
 
-        new[i] = erode(images[i])
+        # images[i] = erode(images[i])
 
-    return new
+    return images
 
 def binarize(image):
-    for j in range(len(image)):
-        for k in range(len(image)):
-            image[j][k] = (lambda x: 1 if x>0 else 0)(image[j][k])
-    return image
+    idx = image < .4
+    # image[idx] = 0
+    # return image
+
+    return (.3<image)
 
 def erode(image):
     eroded = cv2.erode(image, kernel, iterations = 1)
