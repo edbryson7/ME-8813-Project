@@ -4,30 +4,34 @@ import numpy as np
 
 def process_image(images):
     global kernel
-    kernel = np.ones((3,3),np.uint8)
+
+    # print(np.shape(images)[1:])
+
+    # kernel = np.ones((3,3),np.uint8)
     # kernel = np.array([[0, 1, 0],[1, 1, 1],[0, 1, 0]],np.uint8)
-    kernel = np.array([[0, 1],[1, 1]],np.uint8)
-    # new = np.full_like(images,0)
+    # kernel = np.array([[0, 0, 1],[0, 0, 1],[0, 0, 1]],np.uint8)
+    kernel = np.array([[1, 1],[1, 1]],np.uint8)
+
+    new = np.zeros((len(images),26,26,1))
+
     for i in range(len(images)):
-        # plt.imshow(images[i])
-        # plt.show()
+        new[i] = crop(images[i])
+        new[i] = erode(new[i])
+        new[i] = binarize(new[i])
 
-        images[i] = binarize(images[i])
+    return new
 
-        # plt.imshow(new[i])
-        # plt.show()
-
-        # images[i] = erode(images[i])
-
-    return images
+def crop(image):
+    return image[1:-1,1:-1]
 
 def binarize(image):
-    idx = image < .4
+    # idx = image < .7
     # image[idx] = 0
-    # return image
+    return image
 
-    return (.3<image)
+    # return (.8<image)
 
 def erode(image):
-    eroded = cv2.erode(image, kernel, iterations = 1)
-    return np.expand_dims(eroded, axis=-1) # <--- add batch axisp
+    image = cv2.dilate(image, kernel, iterations = 1)
+    image = cv2.erode(image, kernel, iterations = 1)
+    return np.expand_dims(image, axis=-1) # <--- add batch axisp

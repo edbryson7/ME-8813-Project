@@ -61,7 +61,6 @@ def main():
         KNN(xtrain, ytrain, xtest, ytest)
 
     else:
-        model.summary()
         CNN1(xtrain, ytrain, xtest, ytest)
         CNN2(xtest,ytest)
 
@@ -74,12 +73,13 @@ def CNN2(xtest, ytest):
     test_cnn(xtest,ytest)
 
 def KNN(xtrain, ytrain, xtest, ytest):
-    # xtrain = IMG_P.process_image(xtrain)
-    # xtest = IMG_P.process_image(xtest)
+
+    xtrain = IMG_P.process_image(xtrain)
+    xtest = IMG_P.process_image(xtest)
     xktrain = [x.flatten() for x in xtrain]
     xktest = [x.flatten() for x in xtest]
 
-    knn = train_knn(xktrain, ytrain, 1)
+    knn = train_knn(xktrain, ytrain, 4)
     test_knn(knn, xktest, ytest)
 
     show_random(xtest)
@@ -162,7 +162,7 @@ def test_cnn(test_images, test_labels):
     plt.savefig('cnn_heatmap.png', dpi=1200)
     plt.show()
 
-def train_knn(train_images, train_labels, k=3):
+def train_knn(train_images, train_labels, k=1):
     knn = neighbors.KNeighborsClassifier(k,weights='distance')
     knn.fit(train_images, train_labels)
 
@@ -198,7 +198,7 @@ def test_knn(knn, test_images, test_labels):
     plt.show()
 
 def show_random(images):
-    ind = [random.randint(0,len(images)) for i in range(10)]
+    ind = [random.randint(0,len(images)) for i in range(3)]
     for i in ind:
         plt.imshow(images[i])
         plt.show()
